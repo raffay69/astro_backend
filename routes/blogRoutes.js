@@ -73,7 +73,9 @@ router.get("/", async (req, res) => {
   const lastCursor = req.query.lastCursor;
   const limit = Number(req.query.limit) || 10;
   const query =
-    lastCursor && lastCursor !== "0" ? { _id: { $gt: atob(lastCursor) } } : {};
+    lastCursor && lastCursor !== "0"
+      ? { createdAt: { $lt: new Date(atob(lastCursor)) } }
+      : {};
   let nextCursor = null;
 
   const blogs = await blogModel
@@ -82,7 +84,7 @@ router.get("/", async (req, res) => {
     .limit(limit + 1);
 
   if (blogs.length > limit) {
-    nextCursor = blogs[limit - 1]._id;
+    nextCursor = blogs[limit - 1].createdAt;
     blogs.pop();
   }
 
